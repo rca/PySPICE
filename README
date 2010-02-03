@@ -1,5 +1,6 @@
 SPICE toolkit Python Module
 Author: Roberto Aguilar, roberto.c.aguilar@jpl.nasa.gov
+Released under the BSD license, see LICENSE for details
 
 In order to build this module, first generate the extension
 code using the mkwrapper.py script.  This is done running

@@ -1,3 +1,5 @@
+# Released under the BSD license, see LICENSE for details
+
 import os
 
 from distutils.core import setup, Extension

@@ -1,3 +1,5 @@
+# Released under the BSD license, see LICENSE for details
+
 import os, sys, unittest
 from spice import Ellipse, Plane
 

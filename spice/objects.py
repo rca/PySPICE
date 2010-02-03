@@ -1,3 +1,5 @@
+# Released under the BSD license, see LICENSE for details
+
 class DataType(object):
     def __init__(self):
         self.SPICE_CHR = 0
