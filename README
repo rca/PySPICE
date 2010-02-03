@@ -1,0 +1,85 @@
+SPICE toolkit Python Module
+Author: Roberto Aguilar, roberto.c.aguilar@jpl.nasa.gov
+
+In order to build this module, first generate the extension
+code using the mkwrapper.py script.  This is done running
+mkwrapper.py with the path to the CSPICE toolkit directory
+as an argument and redirecting the output to "spicemodule.c":
+
+python mkwrapper.py /path/to/cspice > spicemodule.c
+
+Once the C file is generated, the module can be compiled:
+
+python setup.py build_ext -I/path/to/cspice/include -L/path/to/cspice/lib
+
+Then the module can be installed using:
+
+python setup.py install --prefix=/installation/path
+
+If the installation path used is not standard, add the path to your PYTHONPATH environment variable.  In bash:
+
+export PYTHONPATH=/installation/path/lib/python<version>/site-packages:${PYTHONPATH}
+
+or *csh
+setenv PYTHONPATH /installation/path/lib/python<version>/site-packages:${PYTHONPATH}
+
+Finally, it can be used as such:
+
+----
+berto:~$ python
+Python 2.4.2 (#2, Sep 30 2005, 21:19:01)
+[GCC 4.0.2 20050808 (prerelease) (Ubuntu 4.0.1-4ubuntu8)] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from spice import *
+>>> furnsh("/home/berto/tmp/insitu/kernels/load.mk")
+>>> utc2et("2004-06-11T19:32:00")
+140254384.18462521
+----
+
+Some things to keep in mind:
+
+The python wrapper drops the _c suffix in all function names, so the
+function utc2et_c becomes utc2et.
+
+Secondly, the CSPICE toolkit passes both inputs and outputs into a
+SPICE function:
+
+----
+SpiceDouble et;
+SpiceChar * utc = "2004-06-11T19:32:00";
+
+utc2et_c(utc, &et);
+
+printf("et: %f\n", et);
+----
+
+But, in Python, the outputs are returned:
+
+----
+utc = "2004-06-11T19:32:00"
+
+et = utc2et(utc)
+
+print "et: %f" % et
+----
+
+If a function returns multiple values they are returned in a tuple:
+
+----
+(target_pos, light_time) = spkpos(target, sc_et, frame, aberration, sc_name)
+
+print "light time: %f" % light_time
+print "xyz: [%e, %e, %e]" % target_pos
+----
+
+In the case above, the target position and light time are returned in
+a tuple.  Additionally, target_pos itself is a tuple; its individual
+elements can be accessed like this:
+
+----
+print "x position: %d" % target_pos[0]
+----
+
+Tuples act just like arrays.
+
+Enjoy!
