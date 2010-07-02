@@ -34,6 +34,8 @@ class Container(dict):
 # generate the wrappers.
 function_types = ('ConstSpiceChar', 'SpiceBoolean', 'SpiceChar', 'SpiceDouble', 'SpiceInt', 'void')
 
+RESERVED_NAMES = ('free',)
+
 # Reasons for excluding the following functions
 # appnd*, etc. - not looked into translating a SpiceCell to a python object yet.
 # axisar_c - haven't written code to parse arrays
@@ -46,6 +48,7 @@ function_types = ('ConstSpiceChar', 'SpiceBoolean', 'SpiceChar', 'SpiceDouble', 
 # dasec_c - how to handle void types in parameter list
 # dafgh_c - does function actually exist?  I found no C file ...
 # ucase_c - not needed for python
+# gfevnt_c, gffove_c, gfocce_c, gfuds_c, uddc_c, uddf_c - how to support callbacks
 exclude_list = (
     'cnames',
 
@@ -77,6 +80,8 @@ exclude_list = (
 
     'lcase_c', 'ucase_c', 'getcml_c', 'lparse_c', 'lparsm_c', 'prompt_c',
     'putcml_c', 'reordc_c', 'shellc_c', 'sumad_c', 'sumai_c',
+
+    'gfevnt_c', 'gffove_c', 'gfocce_c', 'gfuds_c', 'uddc_c', 'uddf_c',
 )
 
 parsing_prototype = False
@@ -718,6 +723,12 @@ def get_tuple_py_string(param_obj, curr_depth=0):
 
     return t
 
+def fixNameCollision(name):
+    if name in RESERVED_NAMES:
+        return name + '_'
+    else:
+        return name
+
 def parse_param(param):
     """
     Take the given parameter and break it up into the type of
@@ -815,7 +826,7 @@ def parse_param(param):
         if name_bracket_pos > -1:
             name = name[0:name_bracket_pos]
 
-        param_obj.name = name
+        param_obj.name = fixNameCollision(name)
         param_obj.is_array = len(param_obj.num_elements)
         determine_py_type(param_obj)
 
