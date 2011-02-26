@@ -18,8 +18,7 @@ Then install::
 
 Manual Instructions
 -------------------
-Though it shouldn't be necessary, here are the old step-by-step instructions
-are still below.
+Though it shouldn't be necessary, here are the old step-by-step instructions.
 
 In order to build this module, first generate the extension code using the
 mkwrapper.py script.  This is done running mkwrapper.py with the path to the
@@ -47,8 +46,6 @@ or *csh::
 
 Usage
 =====
-
-Finally, it can be used as such::
 
   berto:~$ python
   Python 2.4.2 (#2, Sep 30 2005, 21:19:01)
