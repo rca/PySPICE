@@ -1033,39 +1033,38 @@ def main(cspice_toolkit):
 
     # print out necessary boilerplate stuff
     return """\
-    /*
-    THIS IS AUTOMATICALLY GENERATED CODE.  IF THERE IS AN ERROR, PLEASE
-    MAKE ANY NECESSARY CHANGES IN THE PYTHON SCRIPT NAMED mkwrapper.py:
+/*
+THIS IS AUTOMATICALLY GENERATED CODE.  IF THERE IS AN ERROR, PLEASE
+MAKE ANY NECESSARY CHANGES IN THE PYTHON SCRIPT NAMED mkwrapper.py:
 
-    %s
+%s
 
-    THIS CODE HAS NOT BEEN THOROUGHLY TESTED, USE AT YOUR OWN RISK, BLAH
-    BLAH BLAH.
-    */
+THIS CODE HAS NOT BEEN THOROUGHLY TESTED, USE AT YOUR OWN RISK, BLAH
+BLAH BLAH.
+*/
 
-    #include "pyspice.h"
-    %s
-    PyMethodDef methods[] = {
-    %s
-      {NULL, NULL},
-    };
+#include "pyspice.h"
+%s
+PyMethodDef methods[] = {
+%s
+  {NULL, NULL},
+};
 
-    void init_spice(PyObject *self)
-    {
-      PyObject *m = NULL;
-      PyObject *SpiceException = NULL;
+void init_spice(PyObject *self)
+{
+  PyObject *m = NULL;
+  PyObject *SpiceException = NULL;
 
-      m = Py_InitModule("_spice", methods);
+  m = Py_InitModule("_spice", methods);
 
-      /* Don't allow an exception to stop execution */
-      erract_c("SET", 0, "RETURN");
-      errdev_c("SET", 0, "NULL");
+  /* Don't allow an exception to stop execution */
+  erract_c("SET", 0, "RETURN");
+  errdev_c("SET", 0, "NULL");
 
-      SpiceException = PyErr_NewException("spice.SpiceException", NULL, NULL);
-      Py_INCREF(SpiceException);
-      PyModule_AddObject(m, "SpiceException", SpiceException);
-    }\
-    """ % ("$Id$", buffer.getvalue(), module_methods.getvalue())
+  SpiceException = PyErr_NewException("spice.SpiceException", NULL, NULL);
+  Py_INCREF(SpiceException);
+  PyModule_AddObject(m, "SpiceException", SpiceException);
+}""" % ("$Id$", buffer.getvalue(), module_methods.getvalue())
 
 if __name__ == '__main__':
     if len(sys.argv):
