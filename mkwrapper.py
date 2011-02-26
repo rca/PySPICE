@@ -1032,7 +1032,7 @@ def main(cspice_toolkit):
         module_methods.write("\n  %s" % module_def)
 
     # print out necessary boilerplate stuff
-    print """\
+    return """\
     /*
     THIS IS AUTOMATICALLY GENERATED CODE.  IF THERE IS AN ERROR, PLEASE
     MAKE ANY NECESSARY CHANGES IN THE PYTHON SCRIPT NAMED mkwrapper.py:
@@ -1073,4 +1073,4 @@ if __name__ == '__main__':
     else:
         sys.exit('Please provide the path to the unpacked cspice toolkit directory')
 
-    main(cspice_toolkit)
+    print main(cspice_toolkit)
