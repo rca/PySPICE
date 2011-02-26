@@ -6,7 +6,7 @@ Python wrapper around the NAIF CSPICE library.  Released under the BSD license, 
 Building PySPICE
 ----------------
 
-First, downloadthe cspice toolkit and extract it to the directory "cspice" in
+First, download the cspice toolkit and extract it to the directory "cspice" in
 this directory right alongside the setup.py file.  Once the cspice source is
 there, run setup.py like so::
 
