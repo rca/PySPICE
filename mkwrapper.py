@@ -1035,12 +1035,11 @@ def main(cspice_toolkit):
     return """\
 /*
 THIS IS AUTOMATICALLY GENERATED CODE.  IF THERE IS AN ERROR, PLEASE
-MAKE ANY NECESSARY CHANGES IN THE PYTHON SCRIPT NAMED mkwrapper.py:
+MAKE ANY NECESSARY CHANGES IN THE PYTHON SCRIPT NAMED mkwrapper.py.
 
-%s
-
-THIS CODE HAS NOT BEEN THOROUGHLY TESTED, USE AT YOUR OWN RISK, BLAH
-BLAH BLAH.
+THIS CODE HAS NOT BEEN THOROUGHLY TESTED, USE AT YOUR OWN RISK, THE
+AUTHOR(S) IS/ARE NOT RESPONSIBLE IF YOUR CRAFT GOES DOWN, BLAH BLAH
+BLAH.  SEE FILE "LICENSE" FOR MORE INFO.
 */
 
 #include "pyspice.h"
@@ -1064,7 +1063,7 @@ void init_spice(PyObject *self)
   SpiceException = PyErr_NewException("spice.SpiceException", NULL, NULL);
   Py_INCREF(SpiceException);
   PyModule_AddObject(m, "SpiceException", SpiceException);
-}""" % ("$Id$", buffer.getvalue(), module_methods.getvalue())
+}""" % (buffer.getvalue(), module_methods.getvalue())
 
 if __name__ == '__main__':
     if len(sys.argv):
