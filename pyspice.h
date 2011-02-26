@@ -6,8 +6,6 @@
  * Author: Roberto Aguilar, roberto.c.aguilar@jpl.nasa.gov
  *
  * Released under the BSD license, see LICENSE for details
- *
- * $Id$
  */
 #include <Python.h>
 #include <SpiceUsr.h>
