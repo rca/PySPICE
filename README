@@ -2,6 +2,23 @@ SPICE toolkit Python Module
 Author: Roberto Aguilar, roberto.c.aguilar@jpl.nasa.gov
 Released under the BSD license, see LICENSE for details
 
+Building this module has been greatly simplified.  It can be built by first
+downloading the cspice toolkit and extracting it to the directory "cspice" in
+this directory right alongside the setup.py file.  Once the cspice source is
+there, run setup.py like so:
+
+python setup.py build_ext -I/path/to/cspice/include -L/path/to/cspice/lib
+
+Then install:
+
+python setup.py install
+
+Though they shouldn't be necessary, the old step-by-step instructions are still
+below.
+
+Manual Instructions
+-------------------
+
 In order to build this module, first generate the extension
 code using the mkwrapper.py script.  This is done running
 mkwrapper.py with the path to the CSPICE toolkit directory
@@ -23,6 +40,9 @@ export PYTHONPATH=/installation/path/lib/python<version>/site-packages:${PYTHONP
 
 or *csh
 setenv PYTHONPATH /installation/path/lib/python<version>/site-packages:${PYTHONPATH}
+
+Usage
+-----
 
 Finally, it can be used as such:
 
