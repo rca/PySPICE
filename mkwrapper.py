@@ -84,11 +84,7 @@ exclude_list = (
     'gfevnt_c', 'gffove_c', 'gfocce_c', 'gfuds_c', 'uddc_c', 'uddf_c',
 )
 
-parsing_prototype = False
-curr_prototype = ''
 module_defs = []
-module_methods = StringIO()
-buffer = StringIO()
 cspice_src = None
 
 DEBUG = 0
@@ -954,12 +950,13 @@ def run_command(command, writer):
 
     return command_handle.close()
 
+def main(cspice_toolkit):
+    global cspice_src
 
-if __name__ == '__main__':
-    if len(sys.argv):
-        cspice_toolkit = sys.argv[1]
-    else:
-        sys.exit('Please provide the path to the unpacked cspice toolkit directory')
+    parsing_prototype = False
+    curr_prototype = ''
+    module_methods = StringIO()
+    buffer = StringIO()
 
     cspice_header = os.path.join(cspice_toolkit, 'include', 'SpiceUsr.h')
     cspice_src = os.path.join(cspice_toolkit, 'src', 'cspice')
@@ -1069,3 +1066,11 @@ if __name__ == '__main__':
       PyModule_AddObject(m, "SpiceException", SpiceException);
     }\
     """ % ("$Id$", buffer.getvalue(), module_methods.getvalue())
+
+if __name__ == '__main__':
+    if len(sys.argv):
+        cspice_toolkit = sys.argv[1]
+    else:
+        sys.exit('Please provide the path to the unpacked cspice toolkit directory')
+
+    main(cspice_toolkit)
