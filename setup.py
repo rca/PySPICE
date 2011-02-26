@@ -1,6 +1,7 @@
 # Released under the BSD license, see LICENSE for details
 
 import os
+import sys
 
 from distutils.core import setup, Extension
 from shutil import copy
@@ -25,6 +26,22 @@ if not os.path.exists(CSPICE_SRC):
 remove_files = []
 
 class LibError(Exception): pass
+
+def build_cspice():
+    libfile_path = os.path.join(CSPICE_SRC, 'lib', 'cspice.a')
+    if os.path.exists(libfile_path):
+        return
+
+    curr_dir = os.getcwd()
+    try:
+        os.chdir(CSPICE_SRC)
+        makeall = Popen('/bin/csh makeall.csh', shell=True)
+        status = os.waitpid(makeall.pid, 0)[1]
+
+        if status != 0:
+            sys.stderr.write('warning: cspice build exit status: %d' % status)
+    finally:
+        os.chdir(curr_dir)
 
 def find_libs():
     for libfile in ('cspice.a', 'csupport.a'):
@@ -55,6 +72,7 @@ def cleanup():
         os.remove(path)
 
 try:
+    build_cspice()
     make_spice_module()
     find_libs()
 
