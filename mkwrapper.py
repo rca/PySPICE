@@ -1043,6 +1043,9 @@ BLAH.  SEE FILE "LICENSE" FOR MORE INFO.
 */
 
 #include "pyspice.h"
+
+PyObject *SpiceException;
+
 %s
 PyMethodDef methods[] = {
 %s
@@ -1052,7 +1055,6 @@ PyMethodDef methods[] = {
 void init_spice(PyObject *self)
 {
   PyObject *m = NULL;
-  PyObject *SpiceException = NULL;
 
   m = Py_InitModule("_spice", methods);
 
@@ -1060,8 +1062,10 @@ void init_spice(PyObject *self)
   erract_c("SET", 0, "RETURN");
   errdev_c("SET", 0, "NULL");
 
-  SpiceException = PyErr_NewException("spice.SpiceException", NULL, NULL);
+  SpiceException = \
+    PyErr_NewException("_spice.SpiceException", PyExc_Exception, NULL);
   Py_INCREF(SpiceException);
+
   PyModule_AddObject(m, "SpiceException", SpiceException);
 }""" % (buffer.getvalue(), module_methods.getvalue())
 

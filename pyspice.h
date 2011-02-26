@@ -15,6 +15,8 @@
 #ifndef __PYSPICE_H__
 #define __PYSPICE_H__ 1
 
+extern PyObject *SpiceException;
+
 #define STRING_LEN 255
 #define SPICE_DETAIL_LEN 1840
 
@@ -25,9 +27,7 @@
   }
 
 #define PYSPICE_MAKE_EXCEPTION(detail) {                                \
-    PyObject *exception = NULL;                                         \
-    exception = PyErr_NewException("spice.SpiceException", NULL, NULL); \
-    PyErr_SetString(exception, detail);                                 \
+    PyErr_SetString(SpiceException, detail);                            \
   }
 
 /* Stuff for getting the short error message
