@@ -10,7 +10,7 @@ First, downloadthe cspice toolkit and extract it to the directory "cspice" in
 this directory right alongside the setup.py file.  Once the cspice source is
 there, run setup.py like so::
 
-  python setup.py build_ext -I/path/to/cspice/include -L/path/to/cspice/lib
+  python setup.py build_ext
 
 Then install::
 
