@@ -27,11 +27,11 @@ CSPICE toolkit directory as an argument and redirecting the output to
 
   python mkwrapper.py /path/to/cspice > spicemodule.c
 
-Once the C file is generated, the module can be compiled:
+Once the C file is generated, the module can be compiled::
 
   python setup.py build_ext -I/path/to/cspice/include -L/path/to/cspice/lib
 
-Then the module can be installed using:
+Then the module can be installed using::
 
   python setup.py install --prefix=/installation/path
 
