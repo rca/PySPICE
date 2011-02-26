@@ -71,10 +71,19 @@ def cleanup():
     for path in remove_files:
         os.remove(path)
 
+def set_build_paths():
+    if not sys.argv[1].startswith('build'):
+        return
+
+    for flag, dirname in (('-I', 'include'), ('-L', 'lib')):
+        path = os.path.join(CSPICE_SRC, dirname)
+        sys.argv.append('%s%s' % (flag, path))
+
 try:
     build_cspice()
     make_spice_module()
     find_libs()
+    set_build_paths()
 
     module1 = Extension(
         '_spice',
