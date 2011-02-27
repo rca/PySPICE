@@ -1,2 +1,5 @@
+.DS_Store
+*.pyc
 spicemodule.c
 build
+cspice
