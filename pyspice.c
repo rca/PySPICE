@@ -67,8 +67,23 @@ PyObject * get_py_ellipse(SpiceEllipse *spice_obj)
 
 PyObject * get_py_cell(SpiceCell *cell)
 {
-    PyObject *py_obj = NULL;
-    return py_obj;
+    PyObject *objects_module = NULL;
+    PyObject *cell = NULL;
+
+    /* TODO: importing module returns a new reference, decrement after use? */
+    objects_module = PyImport_ImportModule("spice.objects");
+
+    /* Also returns new reference, but this object should live on so it is
+       usable on the python side */
+    cell = PyObject_GetAttr(objects_module, "Cell");
+
+    /* fill in the values here */
+    PyObject_SetAttr(cell, "length", Py_BuildValue("l", cell->length));
+
+    /* TODO: done with objects_module, decrement, right? */
+    Py_DECREF(objects_module);
+
+    return cell;
 }
 
 PyObject * get_py_ekattdsc(SpiceEKAttDsc *spice_obj)
