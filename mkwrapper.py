@@ -469,7 +469,7 @@ def gen_wrapper(prototype, buffer):
     
     debug("output list: %s" % output_list_string)
     
-    if input_list_string != '' and output_list_string != '':
+    if input_list_string and output_list_string:
         param_list_string = "%s, %s" % (input_list_string, output_list_string)
     elif input_list_string:
         param_list_string = input_list_string
