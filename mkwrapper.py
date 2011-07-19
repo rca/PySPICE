@@ -87,7 +87,7 @@ exclude_list = (
 module_defs = []
 cspice_src = None
 
-DEBUG = 1 # set it on when string is the right one
+DEBUG = 0 # set it on when string is the right one
 
 INPUT_TYPE = 0
 OUTPUT_TYPE = 1
@@ -167,7 +167,7 @@ def get_doc(function_name):
             input = f.readline()
             input_len = len(input)
             
-            if input == "": break
+            if not input: break
             
             input = input.rstrip()
             
@@ -180,7 +180,7 @@ def get_doc(function_name):
             
             if split[0] in sections:
                 while 1:
-                    if input == '':
+                    if not input:
                         doc.write('\\n')
                     else:
                         doc.write('%s\\n' % input.replace('\\', '\\\\').replace('"', '\\"'))
@@ -189,7 +189,7 @@ def get_doc(function_name):
                     input_len = len(input)
                     input = input.rstrip()
                     
-                    if input == '':
+                    if not input:
                         continue
                     elif input[0] == '-':
                         f.seek(f.tell()-input_len)
@@ -543,7 +543,7 @@ def gen_wrapper(prototype, buffer):
     # dig out the function name from the source file
     doc = get_doc(prototype_obj.function_name)
     
-    if doc == '':
+    if not doc:
         buffer.write('\nPyDoc_STRVAR(%s_doc, "");\n' % python_function_name)
     else:
         buffer.write('\nPyDoc_STRVAR(%s_doc, %s);\n' % (python_function_name, doc))
@@ -619,7 +619,7 @@ def make_automatic_returnVal(buffer, output_list):
     
     output_list_string = ", ".join(t_list)
     
-    if output_list_string != '':
+    if output_list_string:
         if check_found:
             buffer.write(
                 '\n  if(!found) {\n    return Py_None;\n  } else {\n    ')
@@ -808,7 +808,7 @@ def parse_param(param):
             try:
                 param_obj.num_elements.append(int(t))
             except Exception, msg:
-                if t != '':
+                if t:
                     raise msg
                 param_obj.num_elements.append('')
             
