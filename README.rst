@@ -16,6 +16,14 @@ Then install::
 
   python setup.py install
 
+64 bit vs 32 bit
+----------------
+CSPICE is published in both 64 and 32 bit versions. Make sure that you compile
+PySPICE with a Python bit architecture that fits to the CSPICE you have
+downloaded, otherwise you will get warnings at compile time (not so bad) and
+errors of missing links in the library at run time (basically, you can't *import
+spice*.
+
 Manual Instructions
 -------------------
 Though it shouldn't be necessary, here are the old step-by-step instructions.
