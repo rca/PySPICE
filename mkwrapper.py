@@ -229,12 +229,7 @@ def gen_wrapper(prototype, buffer):
     buildvalue_string = ""
     
     # remove the _c suffix for the python function name
-    if prototype_obj.function_name.endswith('_c'):
-        python_function_name = prototype_obj.function_name[0:-2]
-    else:
-        python_function_name = prototype_obj.function_name
-    
-    debug('in gen wrapper: function name {0}'.format(python_function_name))
+    python_function_name = prototype_obj.function_name.rsplit('_c',1)[0]
     
     # Add the C function prototype to the source code output.
     t = '/* %s */' % prototype
@@ -262,11 +257,11 @@ def gen_wrapper(prototype, buffer):
     last_item = None
     t_type = None
     for param in prototype_obj.params:
-        debug('')
+        #debug('')
         param_info = parse_param(param)
         if param_info is None:
             continue
-        debug("parsed param: %s" % param_info)
+        #debug("parsed param: %s" % param_info)
         
         if param_info.is_array and not param_info.is_const:
             t_type = OUTPUT_TYPE
@@ -298,9 +293,9 @@ def gen_wrapper(prototype, buffer):
             output_list.append(param_info)
         
         last_item = param_info
-        debug("param after hack: %s" % param_info)
+        #debug("param after hack: %s" % param_info)
     
-    debug("")
+    #debug("")
     
     # parse the outputs
     if output_list:
@@ -467,7 +462,7 @@ def gen_wrapper(prototype, buffer):
     else:
         output_list_string = ''
     
-    debug("output list: %s" % output_list_string)
+    #debug("output list: %s" % output_list_string)
     
     if input_list_string and output_list_string:
         param_list_string = "%s, %s" % (input_list_string, output_list_string)
@@ -476,7 +471,7 @@ def gen_wrapper(prototype, buffer):
     else:
         param_list_string = output_list_string
     
-    debug(param_list_string)
+    # debug(param_list_string)
     
     # Call the C function
     if prototype_obj.type != "void":
@@ -521,12 +516,12 @@ def gen_wrapper(prototype, buffer):
     # to return.
     if output_list:
         # output_list_string = ', '.join(output_list)
-        debug('output_list: '.format(output_list))
+        #debug('output_list: '.format(output_list))
         if manually_build_returnVal:
-            debug('in manual returnVal build')
+            #debug('in manual returnVal build')
             make_manual_returnVal(buffer, output_list)
         else:
-            debug('in automatic returnVal build')
+            #debug('in automatic returnVal build')
             make_automatic_returnVal(buffer, output_list)
     elif prototype_obj.type == "void":
         buffer.write("\n  Py_INCREF(Py_None);")
@@ -738,8 +733,8 @@ def parse_param(param):
     
     param_obj.original = param
     
-    debug('param: %s' % param)
-    debug('param_split: %s' % str(param_split))
+    #debug('param: %s' % param)
+    #debug('param_split: %s' % str(param_split))
     
     index = 0
     
@@ -789,21 +784,21 @@ def parse_param(param):
             open_bracket_pos = param.find('[', start_find)
             start_find = open_bracket_pos + 1
             
-            debug('open_bracket_pos: %s' % open_bracket_pos)
+            #debug('open_bracket_pos: %s' % open_bracket_pos)
             
             # if no open bracket was found, break out of the loop
             if open_bracket_pos == -1:
                 break
             close_bracket_pos = param.find(']', start_find)
             
-            debug('close_bracket_pos: %s' % close_bracket_pos)
+            #debug('close_bracket_pos: %s' % close_bracket_pos)
             
             # try to convert the number of the elements into an
             # integer.  this may fail if the brackets are empty.  If
             # they are empty, don't fail, or else raise the exception.
             t = param[open_bracket_pos+1:close_bracket_pos]
             
-            debug('t: %s' % t)
+            #debug('t: %s' % t)
             
             try:
                 param_obj.num_elements.append(int(t))
@@ -812,9 +807,9 @@ def parse_param(param):
                     raise msg
                 param_obj.num_elements.append('')
             
-            debug('num_elements: %s' % str(param_obj.num_elements))
+            #debug('num_elements: %s' % str(param_obj.num_elements))
         
-        debug('num_elements (out of loop): %s' % param_obj.num_elements)
+        #debug('num_elements (out of loop): %s' % param_obj.num_elements)
         
         # check if the bracket was stuck on the variable and
         # remove it
@@ -826,12 +821,12 @@ def parse_param(param):
         param_obj.is_array = len(param_obj.num_elements)
         determine_py_type(param_obj)
         
-        debug('type: %s' % param_obj.type)
-        debug('is_const: %s' % param_obj.is_const)
-        debug('name: %s' % param_obj.name)
-        debug('is_pointer: %s' % param_obj.is_pointer)
-        debug('is_array: %s' % str(param_obj.is_array))
-        debug('py_string: %s' % param_obj.py_string)
+        #debug('type: %s' % param_obj.type)
+        #debug('is_const: %s' % param_obj.is_const)
+        #debug('name: %s' % param_obj.name)
+        #debug('is_pointer: %s' % param_obj.is_pointer)
+        #debug('is_array: %s' % str(param_obj.is_array))
+        #debug('py_string: %s' % param_obj.py_string)
         
         if param_obj.is_array:
             param_obj.py_string = get_tuple_py_string(param_obj)
@@ -877,10 +872,10 @@ def parse_prototype(prototype):
     try:
         params = params[params.index("(")+1:params.index(")")].strip().split(",")
         
-        debug("type: %s, function: %s, is_pointer: %s, params: %s" % \
-            (type, function_name, is_pointer, params))
+        #debug("type: %s, function: %s, is_pointer: %s, params: %s" % \
+            # (type, function_name, is_pointer, params))
     except:
-        debug("unable to parse params for function %s" % function_name)
+        #debug("unable to parse params for function %s" % function_name)
         debug(function_name[-1])
     
     prototype_obj.type = type
@@ -889,10 +884,10 @@ def parse_prototype(prototype):
     prototype_obj.params = params
     determine_py_type(prototype_obj)
     
-    debug('function_name: %s, type: %s, py_string: %s\n' % \
-        (prototype_obj.function_name,
-         prototype_obj.type,
-         prototype_obj.py_string))
+    #debug('function_name: %s, type: %s, py_string: %s\n' % \
+        # (prototype_obj.function_name,
+        #  prototype_obj.type,
+        #  prototype_obj.py_string))
     
     return prototype_obj
 
@@ -982,7 +977,7 @@ def main(cspice_toolkit):
     while 1:
         input = output.readline()
         line_no +=1
-        # debug('line: {1}, input: {0}'.format(input,line_no))
+        # #debug('line: {1}, input: {0}'.format(input,line_no))
         if input == "":
             break
         input = input.strip()
@@ -993,11 +988,11 @@ def main(cspice_toolkit):
         elif not parsing_prototype and "(" not in input:
             continue
         if parsing_prototype:
-            # debug("parse_adding: %s" % input)
+            # #debug("parse_adding: %s" % input)
             
             curr_prototype += input
             
-            # debug("curr_prototype now: %s" % curr_prototype)
+            # #debug("curr_prototype now: %s" % curr_prototype)
             
             # if the last character is a semi-colon, the prototype is
             # complete, pass it along to the wrapper generator and clear
@@ -1006,8 +1001,8 @@ def main(cspice_toolkit):
                 parsing_prototype = False
                 
                 # gen_wrapper can return False, then don't count it as used
-                debug('')
-                debug('%s\n' % curr_prototype)
+                #debug('')
+                #debug('%s\n' % curr_prototype)
                 if gen_wrapper(curr_prototype, buffer):
                     used_prototypes += 1
                 total_prototypes += 1
@@ -1016,17 +1011,17 @@ def main(cspice_toolkit):
             pass
         else:
             first_word = input[0:input.index(" ")]
-            # debug('first_word: {0}'.format(first_word))
+            # #debug('first_word: {0}'.format(first_word))
             if first_word in function_types:
-                # debug("adding %s" % input)
+                # #debug("adding %s" % input)
                 
                 curr_prototype += input
                 
-                # debug("curr_prototype now: %s" % curr_prototype)
+                # #debug("curr_prototype now: %s" % curr_prototype)
             else:
                 continue
             if input.endswith(";"):
-                # debug("prototype to be wrapped: {0}".format(curr_prototype))
+                # #debug("prototype to be wrapped: {0}".format(curr_prototype))
                 gen_wrapper(curr_prototype, buffer)
                 curr_prototype = ""
             else:
