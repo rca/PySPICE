@@ -609,7 +609,7 @@ def make_automatic_returnVal(buffer, output_list):
         # to build a python tuple out of them (This seems sub-optimal, I
         # have to read some more python C documentation).
         if output.is_array:
-            t_list = get_array_sizes(output.num_elements, output.name)
+            t_list += get_array_sizes(output.num_elements, output.name)
         elif(output.get_py_fn):
             t_list.append('%s(&%s)' % (output.get_py_fn, output.name))
         else:
@@ -1006,11 +1006,10 @@ def main(cspice_toolkit):
                 parsing_prototype = False
                 
                 # gen_wrapper can return False, then don't count it as used
-                if 'subpnt' in curr_prototype or 'spkpos' in curr_prototype:
-                    debug('')
-                    debug('%s\n' % curr_prototype)
-                    if gen_wrapper(curr_prototype, buffer):
-                        used_prototypes += 1
+                debug('')
+                debug('%s\n' % curr_prototype)
+                if gen_wrapper(curr_prototype, buffer):
+                    used_prototypes += 1
                 total_prototypes += 1
                 
                 curr_prototype = ""
@@ -1028,7 +1027,7 @@ def main(cspice_toolkit):
                 continue
             if input.endswith(";"):
                 # debug("prototype to be wrapped: {0}".format(curr_prototype))
-                # gen_wrapper(curr_prototype, buffer)
+                gen_wrapper(curr_prototype, buffer)
                 curr_prototype = ""
             else:
                 parsing_prototype = True
