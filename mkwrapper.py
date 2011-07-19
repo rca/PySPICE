@@ -246,7 +246,7 @@ def gen_wrapper(prototype, buffer):
         
         prototype_comment_list.append(t[:count])
         t = t[count:]
-    if len(t):
+    if t:
         prototype_comment_list.append(t)
     
     prototype_comment = '\n'.join(prototype_comment_list)
@@ -303,7 +303,7 @@ def gen_wrapper(prototype, buffer):
     debug("")
     
     # parse the outputs
-    if len(output_list):
+    if output_list:
         buffer.write("\n  /* variables for outputs */")
     
     #print 'function_name: %s' % function_name
@@ -349,7 +349,7 @@ def gen_wrapper(prototype, buffer):
         output_name_list.append(output.name)
     
     # parse the inputs
-    if len(input_list):
+    if input_list:
         buffer.write("\n  /* variables for inputs */")
     
     # in the loop below, the variables are being declared as type
@@ -402,7 +402,7 @@ def gen_wrapper(prototype, buffer):
     # other variables needed below
     buffer.write('\n\n  char failed = 0;')
     
-    if not manually_build_returnVal and len(output_list):
+    if not manually_build_returnVal and output_list:
         buffer.write('\n  char buildvalue_string[STRING_LEN] = "";')
     
     # configure the input string list for parsing the args tuple
@@ -424,14 +424,14 @@ def gen_wrapper(prototype, buffer):
     
     # generate the PyArg_ParseTuple call if there were any inputs to
     # this function
-    if len(input_name_list):
+    if input_name_list:
         buffer.write(
             ('\n  PYSPICE_CHECK_RETURN_STATUS(' +
              'PyArg_ParseTuple(args, "%s", %s));') % \
             (parse_tuple_string, input_list_string))
     
     # if there are any Python -> C conversions that need to occur, add them here.
-    if len(py_to_c_conversions):
+    if py_to_c_conversions:
         buffer.write('\n  %s\n' % '\n'.join(py_to_c_conversions))
     
     for output in output_list:
@@ -447,7 +447,7 @@ def gen_wrapper(prototype, buffer):
     
     # combine the input name list and the output name list for the C
     # function call
-    if len(input_list):
+    if input_list:
         input_list_string = ", ".join(input_name_list)
     else:
         input_list_string = ""
@@ -462,7 +462,7 @@ def gen_wrapper(prototype, buffer):
         else:
             t_list.append("&" + output.name)
     
-    if len(t_list):
+    if t_list:
         output_list_string = ', '.join(t_list)
     else:
         output_list_string = ''
@@ -501,7 +501,7 @@ def gen_wrapper(prototype, buffer):
     # loop through the output to build the value strings for each output if
     # the return value is not being built up manually
     if not manually_build_returnVal:
-        if len(output_list):
+        if output_list:
             buffer.write('\n  /* put together the output buildvalue string */')
         
         for output in output_list:
@@ -519,7 +519,7 @@ def gen_wrapper(prototype, buffer):
     
     # If the called function is a void, return PyNone, or else figure out what
     # to return.
-    if len(output_list):
+    if output_list:
         # output_list_string = ', '.join(output_list)
         debug('output_list: '.format(output_list))
         if manually_build_returnVal:
@@ -1076,7 +1076,7 @@ void init_spice(PyObject *self)
 }""" % (buffer.getvalue(), module_methods.getvalue())
 
 if __name__ == '__main__':
-    if len(sys.argv):
+    if sys.argv:
         cspice_toolkit = sys.argv[1]
     else:
         sys.exit('Please provide the path to the unpacked cspice toolkit directory')
