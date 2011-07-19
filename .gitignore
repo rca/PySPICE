@@ -1,2 +1,3 @@
 spicemodule.c
 build
+*.pyc
