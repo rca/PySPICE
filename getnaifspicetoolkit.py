@@ -8,6 +8,7 @@
 #   getnaiftoolkit.py x
 #
 # Author: Brian Carich, drbitboy@gmail.com
+# Original date:  2012-01-05
 #
 # Released under the BSD license, see LICENSE for details
 #
