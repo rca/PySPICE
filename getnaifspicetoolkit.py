@@ -5,10 +5,10 @@
 # Run this command to extract appropriate JPL/NAIF SPICE toolkit
 # into ./cspice/:
 #
-#   getnaiftoolkit.py x
+#   getnaiftoolkit.py extract
 #
-# Author: Brian Carich, drbitboy@gmail.com
-# Original date:  2012-01-05
+# Author: Brian Carcich, drbitboy@gmail.com
+# Original date:  2013-01-05
 #
 # Released under the BSD license, see LICENSE for details
 #
@@ -21,11 +21,11 @@ Extracts JPL/NAIF SPICE toolkit from compressed URL stream of
 
   cspice.tar.Z
 
-N.B. Broken for Windows:  does not handle .ZIP yet
+N.B. Untested for Windows/VisualC, cspice.zip
 
 Usage:  
 
-  % python getnaiftoolkit.py [x[ 'tarArg0[ tarArg1[ ...]]']]
+  % python getnaiftoolkit.py [extract] [topdir=subdir/] [test=MACH_OS_COMPILER_NNbit]
 
   ### default sys.argv[1] is tv => tar tvf -, so
   ###
@@ -36,7 +36,7 @@ Usage:
 In Python:
 
   import getnaiftoolkit
-  getnaiftoolkit.main(['tv'],[''])
+  getnaiftoolkit.main(['extract'])
 
 """
 import re
@@ -46,7 +46,7 @@ import urllib
 import subprocess
 
 ########################################################################
-def getnstkurl():
+def getnstkurl(force=None,log=False):
   """
 Select URL of NAIF SPICE toolkit cspice.tar.Z suitable for
 local OS (os.uname()[0]) and architecture (os.uname()[-1])
@@ -100,11 +100,11 @@ Index of http://naif.jpl.nasa.gov/pub/naif/toolkit/C/:
   ###   SUNOS and SUN4U => SunSPARC_Solaris
   ###
   
-  dSys1 = dict( OSX=dict( I386='MacIntel', PPC='MacPPC', sis2='OSX' )
-              , LINUX=dict( I386='PC', X86_64='PC', sis2='Linux' )
-              , CYGWIN=dict( I386='PC', X86_64='PC', sis2='Cygwin' )
-              , WINDOWS=dict( I386='PC', X86_64='PC', sis2='Windows' )
-              , SUNOS=dict( I386='SunIntel', SUN4U='SunSPARC', sis2='Solaris' )
+  dSys1 = dict( OSX=dict( I386='MacIntel', PPC='MacPPC', sis2='OSX', zSfx='tar.Z' )
+              , LINUX=dict( I386='PC', X86_64='PC', sis2='Linux', zSfx='tar.Z' )
+              , CYGWIN=dict( I386='PC', X86_64='PC', sis2='Cygwin', zSfx='tar.Z' )
+              , WINDOWS=dict( I386='PC', X86_64='PC', sis2='Windows', zSfx='zip' )
+              , SUNOS=dict( I386='SunIntel', SUN4U='SunSPARC', sis2='Solaris', zSfx='tar.Z' )
               )
 
   ### Suffix:  32bit or 64bit:
@@ -131,14 +131,11 @@ Index of http://naif.jpl.nasa.gov/pub/naif/toolkit/C/:
 
   opsys=opsys[:6]
 
-  zSfx='.tar.Z'
-
   if opsys=='OSX':
     compiler='AppleC'
 
   elif opsys=='WINDOWS':
     compiler='VisualC'
-    zSfx='zip'
 
   elif opsys=='LINUX' or opsys=='CYGWIN':
     compiler='GCC'
@@ -161,74 +158,121 @@ Index of http://naif.jpl.nasa.gov/pub/naif/toolkit/C/:
 
   subdir='_'.join([ dSys1[opsys][machine], dSys1[opsys]['sis2'], compiler, unbit ])
 
+  fullurl = os.path.join( 'http://naif.jpl.nasa.gov/pub/naif/toolkit/C/', subdir, 'packages', 'cspice.'+ dSys1[opsys]['zSfx'] )
+
+  if not (force is None):
+    M,O,C,B = [s.upper() for s in force.split('_')]
+    oldurl = fullurl
+    fullurl = os.path.join( 'http://naif.jpl.nasa.gov/pub/naif/toolkit/C/', force, 'packages', 'cspice.'+ dSys1[O]['zSfx'] )
+    if log:  sys.stderr.write( '### Overriding %s with %s\n' % (oldurl,fullurl,) )
+
   ### ... and return the full URL
 
-  return os.path.join( 'http://naif.jpl.nasa.gov/pub/naif/toolkit/C/', subdir, 'packages', 'cspice'+zSfx )
+  return fullurl
 
 ########################################################################
-def main(opts1='tv',opts2=''):
+def main(argv):
   """
   getnaiftoolkit.main()
 
-  Use getnstkurl() above to stream cspice.tar.Z from JPL/NAIF
-  website into 'gunzip | tar <opts1>f - [opts2] cspice/'
+  Use getnstkurl() above to stream cspice.tar.Z or .zip from JPL/NAIF
+  website into 'gunzip | tar ?f - [-C subdir/] cspice/' for
+  non-Windows systems, or into StringIO => ZipFile for Windows
 
   - do no use tar z.f - as it will not work on Solaris
 
   Arguments:
 
-    opts1  prefix to 'f -' in tar e.g. 'tar tvf -' (default)
+    argv:  list, or tuple, of strings, equivalent to typical sys.argv
 
-    opts2  more tar options e.g. -C othersubdir/
+    - list                   - list cspice/ files in cspice.{tar.gz,zip}
+    - extract                - extract cspice/ files from cspice.{tar.gz,zip}
+    - topdir=dir/subdir/     - extract files to .../
+    - test=MACH_OS_CC_NNbit  - extract files to .../
   """
+
+  actionOption='list'
+  topdirOption='./'
+  testOption=None
+
+  for arg in argv:
+    if arg=='extract': actionOption='extract' ; continue
+    if arg=='list': actionOption='list' ; continue
+    if arg[:7]=='topdir=': topdirOption=arg[7:] ; continue
+    if arg[:5]=='test=': testOption=arg[5:] ; continue
 
   ### Get URL and open as stream
 
-  nstkurl = getnstkurl()
+  nstkurl = getnstkurl(force=testOption,log=True)
   zurl = urllib.urlopen( nstkurl )
 
-  ### Build subprocess command
+  if nstkurl[-4:].lower()=='.zip':
 
-  cmd = '( gunzip | tar %sf - %s )' % (opts1,opts2)
+    ### If URL is a .ZIP file, read entire file into StringIO buffer
+    ### and use zipfile.ZipFile to extract cspice/
 
-  sys.stdout.write( '### Executing command "%s" on URL \n### %s\n###' % (cmd,nstkurl,) )
+    import zipfile
+    from StringIO import StringIO
 
-  ### Spawn 'gunzip|tar' subproces
+    sys.stderr.write( "### Downloading %s this may take a while ..." % (nstkurl,) )
+    sys.stderr.flush()
 
-  process = subprocess.Popen( '( gunzip | tar %sf - %s cspice/ )' % (opts1,opts2), shell=True, stdin=subprocess.PIPE )
+    zf = zipfile.ZipFile(StringIO(zurl.read()))
 
-  ### Read 10k compressed characters => every 100 reads will be ~1MB
-  ### Since cspice.tar.Z ranges from 20MB to 36MB, there will be
-  ###   less than 4000 reads.
+    sys.stderr.write( " download complete; %sing files from cspice/ ...\n" % (actionOption,) )
+    sys.stderr.flush()
 
-  n = 4000
+    for info in zf.infolist():
+      filepath=info.filename
+      if os.path.dirname(filepath)[:7]=='cspice/':
+        if actionOption=='list':
+          print( os.path.join( topdirOption, filepath ) )
+        elif actionOption=='extract':
+          zf.extract(member=filepath,path=topdirOption)
 
-  ### Read 10k compressed characters at a time and pass them to
-  ###   subprocess (gunzip|tar)
+    print( "### %sing complete" % (actionOption,) )
 
-  zs = zurl.read(10240)
-  while len(zs)>0:
-    process.stdin.write( zs )
+  else:
+    ### If URL is not a .ZIP file, assume it is .tar.Z, and
+    ### extract data with pipe to subprocess ( gunzip | tar ..f - ) 
 
-    if (n%100)==0:
-      sys.stdout.write( ' %d' % (n/100,) )
-      sys.stdout.flush()
-    n -= 1
+    ### Build subprocess command
+
+    tarAction=dict( list='tv', extract='x')[actionOption]
+    cmd = '( gunzip | tar %sf - %s )' % (tarAction,'-C '+topdirOption,)
+
+    sys.stderr.write( '### Executing command "%s" on URL \n### %s\n###' % (cmd,nstkurl,) )
+
+    ### Spawn 'gunzip|tar' subproces
+
+    process = subprocess.Popen( cmd, shell=True, stdin=subprocess.PIPE )
+
+    ### Read 10k compressed characters => every 100 reads will be ~1MB
+    ### Since cspice.tar.Z ranges from 20MB to 36MB, there will be
+    ###   less than 4000 reads.
+
+    n = 4000
+
+    ### Read 10k compressed characters at a time and pass them to
+    ###   subprocess (gunzip|tar)
+
     zs = zurl.read(10240)
+    while len(zs)>0:
+      process.stdin.write( zs )
 
-  print( ' Done' )
+      if (n%100)==0:
+        sys.stderr.write( ' %d' % (n/100,) )
+        sys.stderr.flush()
+      n -= 1
+      zs = zurl.read(10240)
+
+  print( '### Done' )
 
   zurl.close()
 
 ########################################################################
 if __name__=="__main__":
   """
-  Usage:  python getnaiftoolkit.py [x [-C subdir/]]
+  Usage:  python getnaiftoolkit.py [extract [topdir=subdir/]]
   """
-  if sys.argv[1:]: opts1 = sys.argv[1]
-  else           : opts1 = 'tv'
-
-  if sys.argv[2:]: opts2 = sys.argv[2]
-  else           : opts2 = ''
-
-  main(opts1,opts2)
+  main(sys.argv[1:])
