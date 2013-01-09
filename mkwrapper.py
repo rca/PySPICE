@@ -54,8 +54,6 @@ exclude_list = (
 
     'appndc_c', 'appndd_c', 'appndi_c', 'zzsynccl_c',
 
-    'axisar_c',
-
     'bodvar_c',
 
     'bschoc_c', 'bsrchc_c', 'dafac_c', 'dafec_c', 'dasac_c', 'ekacec_c',
